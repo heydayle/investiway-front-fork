@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, TextField, Typography } from '@mui/material';
 import Select from '@mui/material/Select';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Add, HorizontalRuleOutlined } from '@mui/icons-material';
-import AddGoal from '../../components/pages/goal/addGoal';
+import AddGoal from '../../components/pages/Goal/addGoal';
 import type { FilterGoal, Goal } from '../../utils/interfaces/goal';
 import { PriorityColor, PriorityType } from '../../utils/enums/goal';
 import dayjs from 'dayjs';
@@ -20,7 +20,7 @@ const Goal = () => {
   //#region [Modal action]
   const [showModal, setShowModal] = useState(false);
   const [goalEdit, setGoalEdit] = useState({} as Goal);
-  const goalSelect = useMemo(() => goalEdit, [goalEdit]);
+  // const goalSelect = useMemo(() => goalEdit, [goalEdit]);
   const enableModel = () => {
     setShowModal(true);
   };

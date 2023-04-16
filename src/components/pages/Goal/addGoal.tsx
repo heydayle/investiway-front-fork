@@ -58,7 +58,9 @@ const AddGoal = ({ isOpen, goalEdit, handleClose }: propsGoadInterface) => {
     });
   }, [isOpen]);
   const changeType = (event: SelectChangeEvent) => {
+    console.log(type);
     setType(event.target.value);
+    console.log(type);
   };
   const changeDate = (value: any) => {
     setGoal((prevState) => {
