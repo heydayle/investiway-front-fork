@@ -9,11 +9,8 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-  InputLabel,
-  MenuItem,
   TextareaAutosize,
 } from '@mui/material';
-import Select from '@mui/material/Select';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -21,8 +18,11 @@ import type { Goal } from '../../../types/goal';
 import type { GoalType } from '../../../types/goalType';
 import dayjs from 'dayjs';
 import AutocompleteInput from '../../share/autocomplete';
-import { FetchTypeGoal } from '../../../api/goal';
+import { FetchTypeGoal, CreateGoalType, DeleteGoalType } from '../../../api/goal';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { AppState } from '../../../stores/store';
+import { GoalTypeResponse, Response } from '../../../types/response';
 
 interface propsGoadInterface {
   isOpen: boolean;
@@ -51,16 +51,34 @@ const AddGoal = ({ isOpen, goalEdit, handleClose, handelEdit }: propsGoadInterfa
     description: '',
     amountTarget: 0,
   } as Goal);
+  const userStore = useSelector((state: AppState) => state.user);
   const [typeGoalList, setTypeGoalList] = useState([] as GoalType[]);
   const getTypeGoal = () => {
-    FetchTypeGoal({})
-      .then((response) => {
-        setTypeGoalList(response.data.result);
+    const userId = userStore.currentUser._id;
+    FetchTypeGoal({ userId })
+      .then((response: Response) => {
+        const result = response.data?.result as GoalTypeResponse;
+        setTypeGoalList(result.data as GoalType[]);
       })
       .catch((e) => {
         toast(e);
       })
       .finally();
+  };
+  const onGoalTypeChange = (goalTypeId: string, needReload: boolean) => {
+    setStateByKey('typeId', goalTypeId);
+    if (needReload) {
+      getTypeGoal();
+    }
+  };
+  const onDeleteGoalType = (goalTypeId: string) => {
+    DeleteGoalType(goalTypeId).then((response: Response) => {
+      if (response.data?.result) {
+        toast('Delete goal type success');
+        if (goalTypeId === goal.typeId) setStateByKey('typeId', '');
+        getTypeGoal();
+      }
+    });
   };
   useEffect(() => {
     getTypeGoal();
@@ -117,23 +135,14 @@ const AddGoal = ({ isOpen, goalEdit, handleClose, handelEdit }: propsGoadInterfa
           </RadioGroup>
         </FormControl>
         <div className="tw-flex tw-space-x-4">
-          <FormControl className="tw-flex-1">
-            <InputLabel id="type-select-label-create">Select type</InputLabel>
-            <Select
-              labelId="type-select-label-create"
-              id="select-label-create"
-              className="tw-w-full"
-              value={goal.typeId}
-              defaultValue={goal.typeId}
-              label="Select type"
-              onChange={(event) => setStateByKey('typeId', event.target.value)}
-            >
-              <MenuItem value={'Shopping'}>Shopping</MenuItem>
-              <MenuItem value={'Tech'}>Tech</MenuItem>
-              <MenuItem value={'Travel'}>Travel</MenuItem>
-            </Select>
-          </FormControl>
-          <AutocompleteInput goalTypeList={typeGoalList} />
+          <div className="tw-flex-1">
+            <AutocompleteInput
+              list={typeGoalList}
+              call={CreateGoalType}
+              onDelete={onDeleteGoalType}
+              onChange={onGoalTypeChange}
+            />
+          </div>
           <LocalizationProvider labelId="datetime-label" dateAdapter={AdapterDayjs}>
             <DatePicker
               value={goal.completeDate}

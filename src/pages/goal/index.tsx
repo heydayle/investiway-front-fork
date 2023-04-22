@@ -51,7 +51,10 @@ const Goal = () => {
     createGoal({ ...goal, amountTarget: Number(goal.amountTarget), userId })
       .then((response) => {
         const result = response.data.result;
-        if (result) toast('Create goal success');
+        if (result) {
+          getGoalUser();
+          toast('Create goal success');
+        }
       })
       .catch(() => {
         toast('Create goal fail');
@@ -94,7 +97,7 @@ const Goal = () => {
     setIsLoading(true);
     getGoal({ userId, ...filter })
       .then((response) => {
-        setGoalList(response.data.result);
+        setGoalList(response.data.result.data);
       })
       .catch((error) => {
         console.log(error);
@@ -205,7 +208,7 @@ const Goal = () => {
           {isLoading && (
             <LogoLoadingIcon className="tw-absolute tw-right-0 tw-bottom-0 tw-animate-spin tw-duration-1000" />
           )}
-          {goalList.length && goalList?.map((goal, index) => goalItem(goal, index))}
+          {goalList?.length && goalList?.map((goal, index) => goalItem(goal, index))}
         </div>
       </div>
     </div>

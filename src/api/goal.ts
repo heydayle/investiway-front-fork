@@ -23,4 +23,17 @@ export function FetchTypeGoal(params: object) {
     params,
   });
 }
+export function CreateGoalType(data: object) {
+  return request({
+    url: '/goal-type',
+    method: 'post',
+    data,
+  });
+}
+export function DeleteGoalType(id: string) {
+  return request({
+    url: `/goal-type/${id}`,
+    method: 'delete',
+  });
+}
 //#endregion
