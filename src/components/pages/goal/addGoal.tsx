@@ -18,8 +18,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { Goal } from '../../../types/goal';
+import type { GoalType } from '../../../types/goalType';
 import dayjs from 'dayjs';
 import AutocompleteInput from '../../share/autocomplete';
+import { FetchTypeGoal } from '../../../api/goal';
+import { toast } from 'react-toastify';
 
 interface propsGoadInterface {
   isOpen: boolean;
@@ -48,7 +51,19 @@ const AddGoal = ({ isOpen, goalEdit, handleClose, handelEdit }: propsGoadInterfa
     description: '',
     amountTarget: 0,
   } as Goal);
+  const [typeGoalList, setTypeGoalList] = useState([] as GoalType[]);
+  const getTypeGoal = () => {
+    FetchTypeGoal({})
+      .then((response) => {
+        setTypeGoalList(response.data.result);
+      })
+      .catch((e) => {
+        toast(e);
+      })
+      .finally();
+  };
   useEffect(() => {
+    getTypeGoal();
     setGoal((prevState) => {
       return {
         ...prevState,
@@ -118,7 +133,7 @@ const AddGoal = ({ isOpen, goalEdit, handleClose, handelEdit }: propsGoadInterfa
               <MenuItem value={'Travel'}>Travel</MenuItem>
             </Select>
           </FormControl>
-          <AutocompleteInput goalTypeList={[]} />
+          <AutocompleteInput goalTypeList={typeGoalList} />
           <LocalizationProvider labelId="datetime-label" dateAdapter={AdapterDayjs}>
             <DatePicker
               value={goal.completeDate}
